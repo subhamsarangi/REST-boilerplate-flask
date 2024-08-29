@@ -1,0 +1,45 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pdb
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+*.env
+
+# Flask
+instance/
+*.sqlite3
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Redis
+*.rdb
+*.aof
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment files
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.dockerignore
+Dockerfile
+docker-compose.yml
+
+# PyCharm
+*.iml

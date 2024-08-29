@@ -1,0 +1,39 @@
+
+# socketio, caching, file uploads
+
+# then oauth, cloudinary uploads, email, payment.
+
+# CELERY SETUP
+python cworker.py
+sudo nano /etc/systemd/system/cworker.service
+
+celery -A app.celery worker --loglevel=info
+
+wsl --setdefault Ubuntu
+wsl --user homelander
+sudo service redis-server start
+#pass: butcher
+
+redis-cli 
+127.0.0.1:6379> ping
+
+# TMUX
+tmux
+    python your_script.py
+
+Detach from the tmux session
+    Ctrl+B followed by D.
+
+List tmux sessions
+    tmux ls
+
+Reattach to a tmux session:
+    tmux attach-session -t <session_id>
+
+## MIRGATION
+
+flask db init
+flask db migrate
+OR 
+flask db migrate -m "Add is_valid column to po_master_update_log"
+flask db upgrade
