@@ -1,8 +1,3 @@
-
-# socketio, caching, file uploads
-
-# then oauth, cloudinary uploads, email, payment.
-
 # CELERY SETUP
 python cworker.py
 sudo nano /etc/systemd/system/cworker.service
