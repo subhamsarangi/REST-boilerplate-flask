@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Auth Test</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.4/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { margin-bottom: 20px; }
+        input { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script type="text/babel">
+        const BACKEND_URL = 'http://127.0.0.1:8000/api';
+        const myAlert = Swal.mixin({
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            toast: true
+        });
+        const App = () => {
+            const [email, setEmail] = React.useState('');
+            const [name, setName] = React.useState('');
+            const [password, setPassword] = React.useState('');
+            const [profile, setProfile] = React.useState(null);
+            const [isLogin, setIsLogin] = React.useState(true);
+            const [isLoggedin, setIsLoggedin] = React.useState(false);
+            const [error, setError] = React.useState(null);
+
+            React.useEffect(() => {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    fetchProfile(token);
+                }
+            }, []);
+
+            const handleRegister = async () => {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/auth/register/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, name, password })
+                    });
+
+                    if (!response.ok){
+                        const data = await response.json();
+                        throw new Error(`Registration failed: ${data.email}`);
+                    }
+                    myAlert.fire({icon: "success",title: "registered successfully"});
+                } catch (error) {
+                    myAlert.fire({icon: "error",title: error});
+                }
+            };
+
+            const handleLogin = async () => {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/auth/login/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok){                        
+                        throw new Error(`login failed: ${data}`);
+                    }
+                    localStorage.setItem('token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    setIsLoggedin(!isLoggedin);
+                    fetchProfile(data.access); // Fetch profile on successful login
+                } catch (error) {
+                    myAlert.fire({icon: "error",title: error});
+                }
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('refresh_token');
+                setProfile(null);
+                setIsLoggedin(!isLoggedin);
+                myAlert.fire({icon: "success",title: 'goodbye netizen!'});
+            };
+
+            const fetchProfile = async (token) => {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/auth/profile/`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok){
+                        setError(`profile fetch failed: ${data}`);
+                        throw new Error(`profile fetch failed: ${data}`);
+                    }                   
+                    setProfile(data);
+                } catch (error) {
+                    myAlert.fire({icon: "error",title: error});
+                }
+            };
+
+            return (
+                <div>
+                    <h1>Auth API Test</h1>
+                    
+                    {!isLoggedin ? 
+                    (
+                        <div>
+                            <button onClick={() => setIsLogin(!isLogin)}>
+                                Switch to {isLogin ? 'Register' : 'Login'}
+                            </button>
+
+                            {isLogin ? (
+                                <div>
+                                    <h2>Login</h2>
+                                    <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+                                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+                                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+                                        <button type="submit">Login</button>
+                                    </form>
+                                </div>
+                            ) : (
+                                <div>
+                                    <h2>Register</h2>
+                                    <form onSubmit={(e) => { e.preventDefault(); handleRegister(); }}>
+                                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+                                        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
+                                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+                                        <button type="submit">Register</button>
+                                    </form>
+                                </div>)}
+                        </div>
+                    )
+                    : (
+                        <div>
+                            <h2>Logout</h2>
+                            <button onClick={handleLogout}>Logout</button>
+
+                            <h2>Profile</h2>
+                            {profile ? (
+                                <div>
+                                    <p><strong>Name:</strong> {profile.name}</p>
+                                </div>
+                            ) : (
+                                <p>{error || 'No profile data available.'}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
