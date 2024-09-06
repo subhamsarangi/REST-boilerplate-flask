@@ -16,3 +16,4 @@ This project is a **flask** _web application_ that leverages various tools and l
 13. real-time user interation updates via **socket**
 14. change password using **email**
 15. **documentation**
+16. ✅ graphql
