@@ -73,10 +73,10 @@ def create_app(config_class):
 
     from app.auth.schema import schema
     app.add_url_rule(
-    '/graphql/auth',
-    view_func=FileUploadGraphQLView.as_view(
-        'graphql', schema=schema, graphiql=True
+        '/graphql/auth',
+        view_func=FileUploadGraphQLView.as_view(
+            'graphql', schema=schema, graphiql=True
+        )
     )
-)
 
     return app

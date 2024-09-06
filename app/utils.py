@@ -30,7 +30,6 @@ def error_response(message, status_code):
     return jsonify({'status': 'error', 'message': str(message)}), status_code
 
 
-
 # Response type for success or error messages
 class ResponseType(graphene.ObjectType):
     status = graphene.String()
